@@ -1,7 +1,7 @@
 {
     "name": "Youtube Recommender Extension Beta",
     "version": "1.0",
-    "description": "Uses OAuth to connect to Google's People API and display contacts photos.",
+    "description": "Personal project to recommend Youtube videos based on user preferences.",
     "manifest_version": 3,
     "action": {
       "default_popup": "popup.html"
@@ -10,13 +10,21 @@
       "service_worker": "background/service-worker.js",
       "type": "module"
     },
+    "oauth2": {
+      "client_id": "704693548770-pctj304tlqajg39d3mqjkd5nfh60tql3.apps.googleusercontent.com",
+      "scopes": [
+        "https://www.googleapis.com/auth/youtube.readonly"
+      ]
+    },
     "permissions": [
+      "identity",
       "storage",
       "tabs",
       "activeTab",
       "scripting"
     ],
     "host_permissions": [
-      "https://www.youtube.com/*"
+      "https://www.youtube.com/*",
+      "https://www.googleapis.com/*"
     ]
   }
