@@ -1,26 +1,27 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { fileURLToPath } from 'url'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { resolve } from "path";
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    outDir: 'dist',
-    rollupOptions: {
-      input: {
-        popup: fileURLToPath(new URL('./popup.html', import.meta.url)),
-        "service-worker": fileURLToPath(new URL('./src/background/service-worker.ts', import.meta.url))
-      },
-      output: {
-
-        entryFileNames: chunk => {
-          if (chunk.name === 'service-worker') {
-            return 'background/service-worker.js'
-          }
-          return 'assets/[name].js'
-        }
-      }
-    }
-  }
-})
+    plugins: [react()],
+    build: {
+        outDir: "dist",
+        sourcemap: true,
+        emptyOutDir: true,
+        rollupOptions: {
+            input: {
+                popup: resolve(__dirname, "src/popup/popup.html"),
+                "service-worker": resolve(__dirname, "src/background/service-worker.ts"),
+            },
+            output: {
+                entryFileNames: (chunk) => {
+                    if (chunk.name === "service-worker") return "background/service-worker.js";
+                    return "assets/[name].js";
+                },
+                chunkFileNames: "assets/[name]-[hash].js",
+                assetFileNames: "assets/[name]-[hash][extname]",
+                manualChunks: undefined,
+            },
+        },
+    },
+});

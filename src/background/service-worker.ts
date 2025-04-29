@@ -2,41 +2,54 @@ chrome.action.onClicked.addListener(() => {
     chrome.tabs.create({ url: "popup.html" });
 });
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log("Message received:", sender, message);
+const OFFSCREEN_DOCUMENT_PATH = "offscreen.html";
+let creatingOffscreen: Promise<void> | null = null;
 
-    if (message?.type === "login") {
-        const clientId = "704693548770-6putqt357sqsr7lo17befl42h816laci.apps.googleusercontent.com";
-        const redirectUri = chrome.identity.getRedirectURL();
-        const scopes = "https://www.googleapis.com/auth/youtube.readonly";
+async function hasOffscreenDocument(): Promise<boolean> {
+    const clientsList = await (self as unknown as ServiceWorkerGlobalScope).clients.matchAll();
+    return clientsList.some((client: Client) => client.url === chrome.runtime.getURL(OFFSCREEN_DOCUMENT_PATH));
+}
 
-        const authUrl = `https://accounts.google.com/o/oauth2/auth` + `?client_id=${clientId}` + `&redirect_uri=${encodeURIComponent(redirectUri)}` + `&response_type=token` + `&scope=${encodeURIComponent(scopes)}` + `&prompt=consent` + `&access_type=online`;
+async function setupOffscreenDocument(): Promise<void> {
+    if (await hasOffscreenDocument()) return;
 
-        chrome.identity.launchWebAuthFlow({ url: authUrl, interactive: true }, (redirectUrl) => {
-            if (chrome.runtime.lastError) {
-                console.error("OAuth failed:", chrome.runtime.lastError.message);
-                sendResponse({ error: chrome.runtime.lastError.message });
-                return;
-            }
+    if (!creatingOffscreen) {
+        creatingOffscreen = chrome.offscreen
+            .createDocument({
+                url: OFFSCREEN_DOCUMENT_PATH,
+                reasons: [chrome.offscreen.Reason.DOM_SCRAPING],
+                justification: "Sign in with Firebase popup",
+            })
+            .then(() => {
+                creatingOffscreen = null;
+            });
+    }
 
-            if (!redirectUrl) {
-                console.error("Redirect URL is undefined or empty");
-                sendResponse({ error: "No redirect URL returned" });
-                return;
-            }
+    return creatingOffscreen;
+}
 
-            const params = new URLSearchParams(new URL(redirectUrl).hash.substring(1));
-            const token = params.get("access_token");
+async function closeOffscreenDocument(): Promise<void> {
+    if (await hasOffscreenDocument()) {
+        await chrome.offscreen.closeDocument();
+    }
+}
 
-            if (token) {
-                console.log("Token acquired:", token);
-                sendResponse({ token });
-            } else {
-                console.error("Token not found in redirect URL");
-                sendResponse({ error: "No token found" });
-            }
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (message.target === "offscreen" && message.type === "firebase-auth") {
+        setupOffscreenDocument().then(() => {
+            // Forward message to offscreen.ts
+            chrome.runtime.sendMessage(
+                {
+                    target: "offscreen",
+                    type: "firebase-auth",
+                },
+                (response) => {
+                    sendResponse(response);
+                    closeOffscreenDocument();
+                }
+            );
         });
-
-        return true; // Keep message channel open
+        
+        return true;
     }
 });

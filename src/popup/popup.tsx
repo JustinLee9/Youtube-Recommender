@@ -1,65 +1,60 @@
-import { useState, useEffect } from 'react';
-import './popup.css';
+import { useState } from 'react';
 
-const Popup = () => {
-  const [token, setToken] = useState<string | null>(null);
+interface FirebaseUser {
+  uid: string;
+  displayName: string | null;
+  email: string | null;
+  photoURL: string | null;
+}
+
+export default function Popup() {
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load the token when the popup is opened
-  useEffect(() => {
-    chrome.storage.local.get('access_token', (result) => {
-      if (result.access_token) {
-        setToken(result.access_token);  // Token exists, user is logged in
-      } else {
-        setToken(null);  // No token, user is not logged in
-      }
-    });
-  }, []);
-
-  const handleLogin = () => {
-    chrome.runtime.sendMessage({ type: 'login' }, (response) => {
-      if (response?.token) {
-        setToken(response.token);
-        setError(null);
-
-        // Save the token in chrome.storage for future use
-        chrome.storage.local.set({ access_token: response.token });
-
-        console.log("Access token:", response.token);
-      } else {
-        setToken(null);
-        setError(response?.error || "Unknown error");
-        console.error("Login failed:", response?.error);
-      }
-    });
-  };
-
-  const handleLogout = () => {
-    setToken(null);
+  const handleSignIn = () => {
+    setLoading(true);
     setError(null);
 
-    // Remove token from chrome.storage
-    chrome.storage.local.remove('access_token', () => {
-      console.log("Logged out and token removed.");
-    });
+    chrome.runtime.sendMessage(
+      { target: 'offscreen', type: 'firebase-auth' },
+      (response) => {
+        setLoading(false);
+
+        if (!response || response.name === 'FirebaseError') {
+          setError(response?.message || 'Authentication failed');
+          return;
+        }
+
+        // The Firebase user object
+        setUser({
+          uid: response.user.uid,
+          displayName: response.user.displayName,
+          email: response.user.email,
+          photoURL: response.user.photoURL,
+        });
+      }
+    );
   };
 
   return (
-    <div>
-      <h1>Youtube Extension</h1>
+    <div style={{ padding: 16, width: 250 }}>
+      <h2>My Extension</h2>
 
-      {token ? (
+      {loading && <p>Signing in...</p>}
+
+      {user ? (
         <div>
-          <p>Logged in</p>
-          <button onClick={handleLogout}>Logout</button>
+          <p>Welcome, {user.displayName || user.email}!</p>
+          {user.photoURL && <img src={user.photoURL} width={40} />}
         </div>
       ) : (
-        <button onClick={handleLogin}>Login with Google</button>
+        <button onClick={handleSignIn} disabled={loading}>
+          Sign in with Google
+        </button>
       )}
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
-};
-
-export default Popup;
+}
