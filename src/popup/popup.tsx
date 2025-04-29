@@ -22,7 +22,7 @@ export default function Popup() {
         setLoading(false);
 
         if (!response || response.name === 'FirebaseError') {
-          setError(response?.message || 'Authentication failed');
+          setError(response?.message || 'Authentication failed'); // Getting Error when sign in button clicked
           return;
         }
 
