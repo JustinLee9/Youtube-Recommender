@@ -1,17 +1,17 @@
 {
-    "name": "Firebase Auth Chrome Extension",
-    "description": "Sign in with Firebase from a Chrome extension using popup + offscreen document.",
-    "version": "1.0.0",
     "manifest_version": 3,
-    "action": {
-        "default_popup": "src/popup/popup.html"
-    },
+    "name": "Firebase Auth Chrome Extension",
+    "version": "1.0.0",
+    "description": "Sign in with Firebase using popup and offscreen document.",
+    "permissions": ["offscreen"],
+    "host_permissions": ["https://*.firebaseapp.com/", "https://*.googleapis.com/", "https://*.gstatic.com/", "https://securetoken.googleapis.com/"],
     "background": {
         "service_worker": "background/service-worker.js",
         "type": "module"
     },
-    "permissions": ["offscreen"],
-    "host_permissions": ["https://*.firebaseapp.com/", "https://*.googleapis.com/", "https://*.gstatic.com/", "https://securetoken.googleapis.com/"],
+    "action": {
+        "default_popup": "popup.html"
+    },
     "web_accessible_resources": [
         {
             "resources": ["offscreen.html"],

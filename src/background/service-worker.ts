@@ -24,6 +24,7 @@ async function setupOffscreenDocument(): Promise<void> {
                 creatingOffscreen = null;
             });
     }
+    console.log("Offscreen created");
 
     return creatingOffscreen;
 }
@@ -35,9 +36,10 @@ async function closeOffscreenDocument(): Promise<void> {
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    console.log("Message recieved", message.target, message.type);
     if (message.target === "offscreen" && message.type === "firebase-auth") {
         setupOffscreenDocument().then(() => {
-            // Forward message to offscreen.ts
+            console.log("Creating offscreen");
             chrome.runtime.sendMessage(
                 {
                     target: "offscreen",

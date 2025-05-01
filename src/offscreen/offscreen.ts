@@ -1,3 +1,10 @@
+console.log('offscreen.js loaded!');
+console.log('document.readyState =', document.readyState);
+
+if (!document.body) {
+  console.error('No <body> found! Cannot append iframe.');
+}
+
 const iframe = document.createElement("iframe");
 iframe.src = "https://extension-a04e7.web.app/signInWithPopup.html";
 document.documentElement.appendChild(iframe);
