@@ -3,7 +3,6 @@ import { promises as fs } from 'fs';
 async function moveHtmlFiles() {
   const mappings = [
     { from: 'dist/src/popup/popup.html', to: 'dist/popup.html' },
-    { from: 'dist/src/offscreen/offscreen.html', to: 'dist/offscreen.html' }
   ];
 
   for (const { from, to } of mappings) {
