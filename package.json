@@ -5,15 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node move-html.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
-    "firebase": "^11.6.1",
+    "firebase": "^11.7.3",
     "google-auth-library": "^9.15.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "vite-plugin-static-copy": "^2.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
