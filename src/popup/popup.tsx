@@ -4,7 +4,6 @@ import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, onAuthStateChanged, User as FirebaseUser, UserCredential } from "firebase/auth/web-extension";
 import "./popup.css";
 
-// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBXsuFqkw65oK9VPQuBIQOMHuzWah9tKgo",
     authDomain: "extension-a04e7.firebaseapp.com",
@@ -15,7 +14,6 @@ const firebaseConfig = {
     measurementId: "G-V3866BPDSR",
 };
 
-// Initialize Firebase app & auth
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
@@ -68,7 +66,6 @@ const Popup: FC = () => {
         await signOut(auth);
     };
 
-    // UI rendering
     if (loading) return <p>Loading…</p>;
     if (user) {
         return (
@@ -86,7 +83,6 @@ const Popup: FC = () => {
     return (
         <div className="container">
             <h2>{isRegister ? "Register" : "Sign In"}</h2>
-            {/* Optional username input for registration */}
             {isRegister && <input type="text" placeholder="Username (optional)" value={username} onChange={onUsernameChange} />}
             <input type="email" placeholder="Email" value={email} onChange={onEmailChange} />
             <input type="password" placeholder="Password" value={password} onChange={onPasswordChange} />
@@ -101,7 +97,6 @@ const Popup: FC = () => {
     );
 };
 
-// Mount component
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error("Root element not found");
 createRoot(rootElement).render(<Popup />);
