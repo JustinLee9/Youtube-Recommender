@@ -10,10 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "firebase": "^11.7.3",
+    "@types/react-youtube": "^7.6.2",
+    "firebase": "^11.8.0",
     "google-auth-library": "^9.15.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-firebase-hooks": "^5.1.1",
+    "react-youtube": "^10.1.0",
     "vite-plugin-static-copy": "^2.3.1"
   },
   "devDependencies": {
@@ -22,6 +25,7 @@
     "@types/node": "^22.14.1",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "@types/youtube": "^0.1.1",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",

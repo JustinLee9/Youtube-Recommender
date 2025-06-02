@@ -1,21 +1,9 @@
 import { useState, useEffect, FC, ChangeEvent } from "react";
 import { createRoot } from "react-dom/client";
-import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, onAuthStateChanged, User as FirebaseUser, UserCredential } from "firebase/auth/web-extension";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, onAuthStateChanged, User as FirebaseUser, UserCredential } from "firebase/auth/web-extension";
 import "./popup.css";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyBXsuFqkw65oK9VPQuBIQOMHuzWah9tKgo",
-    authDomain: "extension-a04e7.firebaseapp.com",
-    projectId: "extension-a04e7",
-    storageBucket: "extension-a04e7.firebasestorage.app",
-    messagingSenderId: "192486774122",
-    appId: "1:192486774122:web:860a3e47704e761c8ec113",
-    measurementId: "G-V3866BPDSR",
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+import { auth } from "../firebase";
+import { SignInButton } from "./signInButton";
 
 type AuthState = {
     user: FirebaseUser | null;
@@ -32,7 +20,7 @@ const Popup: FC = () => {
     const [isRegister, setIsRegister] = useState<boolean>(false);
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const [username, setUsername] = useState<string>(""); // optional display name
+    const [username, setUsername] = useState<string>("");
 
     // Listen to auth state
     useEffect(() => {
@@ -48,7 +36,6 @@ const Popup: FC = () => {
             let userCred: UserCredential;
             if (isRegister) {
                 userCred = await createUserWithEmailAndPassword(auth, email, password);
-                // If provided, set the username as displayName
                 if (username.trim()) {
                     await updateProfile(userCred.user, { displayName: username.trim() });
                 }
@@ -76,16 +63,15 @@ const Popup: FC = () => {
         );
     }
 
-    const onEmailChange = (e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
-    const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
-    const onUsernameChange = (e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value);
-
     return (
         <div className="container">
             <h2>{isRegister ? "Register" : "Sign In"}</h2>
-            {isRegister && <input type="text" placeholder="Username (optional)" value={username} onChange={onUsernameChange} />}
-            <input type="email" placeholder="Email" value={email} onChange={onEmailChange} />
-            <input type="password" placeholder="Password" value={password} onChange={onPasswordChange} />
+            <SignInButton />
+            <hr />
+            {/* Existing email/password form */}
+            {isRegister && <input type="text" placeholder="Username (optional)" value={username} onChange={(e) => setUsername(e.target.value)} />}
+            <input type="email" placeholder="Email" value={email} onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)} />
+            <input type="password" placeholder="Password" value={password} onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} />
             <button onClick={handleAuth} disabled={!email || !password}>
                 {isRegister ? "Register" : "Sign In"}
             </button>
