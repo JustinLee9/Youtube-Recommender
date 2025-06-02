@@ -1,18 +1,29 @@
 {
     "manifest_version": 3,
-    "name": "Firebase Auth Chrome Extension",
+    "name": "YouTube Extension",
     "version": "1.0.0",
-    "description": "Sign in with Firebase using popup and the modular SDK.",
-    "permissions": ["storage"],
-    "host_permissions": ["https://*.firebaseapp.com/*", "https://*.googleapis.com/*", "https://*.gstatic.com/*", "https://securetoken.googleapis.com/*"],
+
+    "permissions": ["storage", "scripting"],
+    "host_permissions": ["https://www.youtube.com/*"],
+
     "background": {
         "service_worker": "background/service-worker.js",
         "type": "module"
     },
+
+    "content_scripts": [
+        {
+            "matches": ["https://www.youtube.com/*"],
+            "js": ["contentScript.js"],
+            "run_at": "document_idle"
+        }
+    ],
+
     "action": {
         "default_popup": "popup.html"
     },
+
     "content_security_policy": {
-        "extension_pages": "script-src 'self'; object-src 'self';"
+        "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://www.youtube.com https://s.ytimg.com;"
     }
 }
